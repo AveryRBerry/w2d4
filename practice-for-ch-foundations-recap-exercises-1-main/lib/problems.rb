@@ -64,17 +64,26 @@ end
 # hash_2.my_select { |k, v| k + 1 == v }      # => {10=>11, 5=>6, 7=>8})
 # hash_2.my_select                            # => {4=>4}
 class Hash
+
   def my_select(&prc)
+
+    hash = Hash.new()
+
     if prc == nil 
-      hash = Hash.new()
+      self.each do |k,v|
+        if k == v
+          hash[k] = v
+        end
+      end
+
+    else
+      self.each do |k,v|
+        hash[k] = v if prc.call(k,v)
+      end
     end
-
-    if prc.call(self)
-
-    end
-
-
+    return hash
   end
+
 end
 
 
@@ -87,9 +96,33 @@ end
 # "cats".substrings     # => ["c", "ca", "cat", "cats", "a", "at", "ats", "t", "ts", "s"]
 # "cats".substrings(2)  # => ["ca", "at", "ts"]
 class String
+
   def substrings(length = nil)
-    
+    new_arr = []
+    new_string = []
+
+    #all sub strings
+    self.each_char.with_index do |char1, i|
+      new_str = char1
+      self.each_char.with_index do |char2, a|
+        if i < a 
+          new_arr << new_str
+          new_str += char2
+        end
+      end
+      new_arr << new_str
+    end
+
+    if length != nil
+      new_arr.each do |el|
+        new_string << el if el.length == length
+      end
+      return new_string
+    end
+
+    return new_arr
   end
+
 end
 
 
@@ -104,6 +137,14 @@ end
 # "zebra".caesar_cipher(4)    #=> "difve"
 class String
   def caesar_cipher(num)
-    
+    alpha = "abcdefghijklmnopqrstuvwxyz"
+    arr = self.split("")
+
+    arr.each_with_index do |char, i|
+      char_index = (alpha.index(char) + num) % 26
+      arr[i] = alpha[char_index]
+    end
+
+    return arr.join("")
   end
 end
